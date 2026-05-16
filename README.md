@@ -64,6 +64,23 @@ Then open the local URL shown in the terminal (typically `http://localhost:8501`
 4. Select your GitHub repo, branch, and set the main file to `app.py`.
 5. Click **Deploy**.
 
+### Push your repo to GitHub
+
+If you have not already created the GitHub remote, use:
+
+```bash
+# replace <your-username> and <repo> with your own values
+git remote add origin https://github.com/<your-username>/<repo>.git
+git branch -M main
+git push -u origin main
+```
+
+If you have GitHub CLI installed, you can also use:
+
+```bash
+gh repo create <repo> --public --source=. --remote=origin --push
+```
+
 ### Important notes
 
 - The app needs the model artifacts in `models/` (`attrition_model.joblib` and `scaler.joblib`). This repo already contains them.
