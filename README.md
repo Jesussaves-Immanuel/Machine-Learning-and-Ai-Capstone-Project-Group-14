@@ -89,6 +89,15 @@ gh repo create <repo> --public --source=. --remote=origin --push
 ## Recommended Workflow
 
 1. Confirm that `dataset/raw/attrition_data.csv` exists.
+   
+## Dataset (Important)
+
+This app and the pre-trained model were built and validated using the CSV at [dataset/raw/attrition_data.csv](dataset/raw/attrition_data.csv). To reproduce the results and use the dashboard correctly, please download and upload this exact CSV in the Streamlit app before running predictions.
+
+- Download the sample CSV directly from the repository: [dataset/raw/attrition_data.csv](dataset/raw/attrition_data.csv)
+- Upload the CSV using the app's sidebar `Upload Dataset` control before using **Data Explorer** or **Batch Prediction**.
+
+The dashboard will warn if required features are missing. The model expects the following features to be present: `MonthlyIncome`, `JobSatisfaction`, `YearsAtCompany`, `OverTime`, `WorkLifeBalance`, `DistanceFromHome`.
 2. If you want to refresh or retrain the model, run the notebook:
 
 ```bash

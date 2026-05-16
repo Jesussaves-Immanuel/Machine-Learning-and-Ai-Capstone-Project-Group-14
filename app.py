@@ -99,17 +99,21 @@ st.markdown("""
         border: 1px solid rgba(255,215,0,0.14);
     }
 
+    .stFileUploader button,
+    .stFileUploader > div > label > div,
     .stButton > button {
-        background: linear-gradient(135deg, #d4af37 0%, #ffd966 100%);
-        color: #081223;
+        background: linear-gradient(135deg, #d4af37 0%, #ffd966 100%) !important;
+        color: #081223 !important;
         font-weight: 700;
-        border-radius: 18px;
+        border-radius: 18px !important;
         height: 52px;
         box-shadow: 0 12px 35px rgba(255,215,0,0.22);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .stButton > button:hover {
+    .stButton > button:hover,
+    .stFileUploader button:hover,
+    .stFileUploader > div > label > div:hover {
         transform: translateY(-1px);
         box-shadow: 0 15px 45px rgba(255,215,0,0.30);
     }
@@ -392,12 +396,35 @@ st.markdown("""
         margin-bottom: 14px;
     }
 
-    .sidebar .sidebar-content {
-        background: rgba(5, 18, 35, 0.95);
+    .sidebar .sidebar-content,
+    .stSidebar,
+    .css-1d391kg,
+    .css-150xejk,
+    .css-1es4b3m,
+    .css-1avcm0n,
+    .css-18ni7ap.e8zbici2,
+    .css-1m9pwf3.e1fqkh3o1 {
+        background: linear-gradient(180deg, #081223 0%, #0d172c 55%, #111b34 100%) !important;
+        color: #f8f4e6 !important;
+        border: none !important;
     }
 
+    .sidebar * {
+        color: #f8f4e6 !important;
+    }
+
+    .sidebar .brand-card,
+    .sidebar .stMarkdown,
+    .sidebar .stRadio,
+    .sidebar .stButton > button {
+        color: inherit !important;
+    }
+
+    .stSidebar {
+        border-right: 1px solid rgba(255,215,0,0.12) !important;
+    }
     .sidebar .stSidebar {
-        border-right: 1px solid rgba(255,215,0,0.12);
+        border-right: 1px solid rgba(255,215,0,0.12) !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -627,6 +654,17 @@ except FileNotFoundError:
 except Exception as e:
     model_loaded = False
 
+# Make sample dataset available for download in the UI
+BASE_DIR = Path(__file__).parent
+SAMPLE_CSV_PATH = BASE_DIR / "dataset" / "raw" / "attrition_data.csv"
+if SAMPLE_CSV_PATH.exists():
+    try:
+        SAMPLE_CSV_BYTES = SAMPLE_CSV_PATH.read_bytes()
+    except Exception:
+        SAMPLE_CSV_BYTES = None
+else:
+    SAMPLE_CSV_BYTES = None
+
 # Main Title
 st.markdown(
     "<div class='hero-card'><div style='display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;'>"
@@ -656,6 +694,20 @@ nav_selection = st.sidebar.radio(
 if "uploaded_df" not in st.session_state:
     st.session_state.uploaded_df = None
 
+
+# Dataset download (placed before upload so users see it first)
+if SAMPLE_CSV_BYTES is not None:
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("**Note:** This model was trained specifically for Golden Palms. For reliable predictions, upload the Golden Palms dataset or a dataset containing the same selected features and encodings.")
+    st.sidebar.markdown("### 📥 Download Golden Palms' Dataset CSV")
+    st.sidebar.download_button(
+        "Download Golden Palms' Dataset CSV",
+        data=SAMPLE_CSV_BYTES,
+        file_name="attrition_data.csv",
+        mime="text/csv",
+        help="Download the exact CSV used to train the model. Upload it below to reproduce results."
+    )
+
 st.sidebar.markdown("---")
 st.sidebar.markdown("## 📄 Upload Dataset")
 uploaded_file = st.sidebar.file_uploader(
@@ -683,6 +735,19 @@ if nav_selection == "Data Explorer":
     df_explore = st.session_state.uploaded_df
     if df_explore is None:
         st.warning("Upload a dataset in the sidebar to populate the Data Explorer.")
+        # Prominent banner telling users to download and upload the CSV before starting
+        st.markdown(
+            """
+            <div style='padding:18px; border-radius:12px; background:#fff3cd; border:1px solid #ffeeba; display:flex; gap:18px; align-items:center;'>
+                <div style='font-size:48px; color:#d39e00;'>➡️</div>
+                <div>
+                    <h3 style='margin:0 0 6px 0;'>Download the training dataset before you begin</h3>
+                    <div style='color:#856404;'>Use the "Download sample dataset (CSV)" button in the sidebar, then upload it using the uploader above to reproduce model results.</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     else:
         total_employees = len(df_explore)
         gender_counts = {'Female': 0, 'Male': 0}
